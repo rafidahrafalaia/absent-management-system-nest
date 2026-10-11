@@ -1,31 +1,27 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { setToken } from './Auth.js';
-import api from '../api/api.js';
+import api, { errorMessage } from '../api/api.js';
 
 const Login = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
+    const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
 
     const handleLogin = async (e) => {
         e.preventDefault();
+        setError('');
+        setLoading(true);
         try {
-            const response = await api.post('/login', {
-                email,
-                password,
-            });
-
-            if (response.data.token) {
-                setToken(response.data.token);
-                navigate('/');
-            } else {
-                setError(response.data.message);
-            }
+            const response = await api.post('/auth/login', { email, password });
+            setToken(response.data.accessToken);
+            navigate('/');
         } catch (err) {
-            console.error('Login error:', err);
-            setError('Failed to log in. Please try again.');
+            setError(errorMessage(err));
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -33,37 +29,36 @@ const Login = () => {
         <div className="login-container">
             <div className="login-form-container">
                 <form onSubmit={handleLogin}>
-                    <h2 className="login-title">Login to your admin account</h2>
-                    {error && <div className="error-message">{error}</div>}
-                    <div className="form-group">
-                        <label htmlFor="email">Email address:</label>
+                    <h2 className="login-title">Employee Monitoring</h2>
+                    <p className="text-muted text-center mb-4">HRD admin login</p>
+                    {error && <div className="alert alert-danger py-2">{error}</div>}
+                    <div className="mb-3">
+                        <label htmlFor="email" className="form-label">Email</label>
                         <input
                             type="email"
                             id="email"
                             className="form-control"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
+                            autoComplete="username"
                             required
                         />
                     </div>
-                    <div className="form-group">
-                        <label htmlFor="password">Password:</label>
+                    <div className="mb-4">
+                        <label htmlFor="password" className="form-label">Password</label>
                         <input
                             type="password"
                             id="password"
                             className="form-control"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
+                            autoComplete="current-password"
                             required
                         />
                     </div>
-                    <div className="form-options">
-                        <div className="form-check">
-                            <input type="checkbox" className="form-check-input" id="rememberMe" />
-                            <label htmlFor="rememberMe" className="form-check-label">Remember me</label>
-                        </div>
-                    </div>
-                    <button type="submit" className="login-button">Login</button>
+                    <button type="submit" className="btn btn-primary w-100" disabled={loading}>
+                        {loading ? 'Logging in...' : 'Login'}
+                    </button>
                 </form>
             </div>
         </div>

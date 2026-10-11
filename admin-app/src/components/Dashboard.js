@@ -1,68 +1,44 @@
-import React, {  } from 'react'
-import {fetchToken} from './Auth.js';
-import { Link, Outlet, useNavigate } from 'react-router-dom'
- 
+import React from 'react'
+import { NavLink, Outlet, useNavigate } from 'react-router-dom'
+import { clearToken } from './Auth.js';
+import Notification from './Notification.js';
+
+const MENU = [
+    { to: '/', label: 'Data Karyawan', end: true },
+    { to: '/create', label: 'Tambah Karyawan' },
+    { to: '/absents', label: 'Absensi Karyawan' },
+];
+
 function Dashboard() {
- 
-    let auth = fetchToken();
-    const headers = {
-        'Content-Type': 'application/json', 
-        'Authorization': auth
-    };
     const navigate = useNavigate();
     const signOut = () => {
-        localStorage.removeItem('Token')
+        clearToken();
         navigate("/login");
     }
+
     return (
-        <div className="container-fluid">
-            <div className="row flex-nowrap">
-                <div className="col-auto col-md-3 col-xl-2 px-sm-2 px-0 bg-dark">
-                    <div className="d-flex flex-column align-items-center align-items-sm-start px-3 pt-2 text-white min-vh-100">
-                        <a href="/" className="d-flex align-items-center pb-3 mb-md-1 mt-md-3 me-md-auto text-white text-decoration-none">
-                            <span className="fs-5 fw-bolder d-none d-sm-inline">Admin Dashboard</span>
-                        </a>
-                        <ul className="nav nav-pills flex-column mb-sm-auto mb-0 align-items-center align-items-sm-start" id="menu">
-                            <li>
-                                <Link to="/" data-bs-toggle="collapse" className="nav-link text-white px-0 align-middle">
-                                    <span className="ms-1 d-none d-sm-inline">Dashboard</span> 
-                                </Link>
-                            </li>
-                            <li>
-                                <Link to="/create" data-bs-toggle="collapse" className="nav-link text-white px-0 align-middle">
-                                    <span className="ms-1 d-none d-sm-inline">Add Employee</span> 
-                                </Link>
-                            </li>
-                            <li>
-                                <Link to="/absents" data-bs-toggle="collapse" className="nav-link text-white px-0 align-middle">
-                                    <span className="ms-1 d-none d-sm-inline">Absent Employee</span> 
-                                </Link>
-                            </li>
-                            {/* <li>
-                                <Link to="profile" className="nav-link px-0 align-middle text-white">
-                                    <span className="ms-1 d-none d-sm-inline">Profile</span>
-                                </Link>
-                            </li> */}
-                            {/* <li>
-                                <Link to="/employee" className="nav-link px-0 align-middle text-white">
-                                    <span className="ms-1 d-none d-sm-inline">Manage Employees</span> 
-                                </Link>
-                            </li> */}
-                            <li>
-                                <button type = 'button' className="btn btn-success" onClick= {signOut}>Sign Out</button>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-                <div className="col p-0 m-0">
-                    <div className='p-2 d-flex justify-content-center shadow'>
-                        <h4>Employee Monitoring System</h4>                     
-                    </div>
-                    <Outlet />
-                </div>
-            </div>
+        <div className="app-layout">
+            <Notification />
+            <nav className="app-sidebar bg-dark text-white">
+                <span className="app-brand">Employee Monitoring</span>
+                <ul className="app-menu">
+                    {MENU.map(item => (
+                        <li key={item.to}>
+                            <NavLink to={item.to} end={item.end} className="app-menu-link">
+                                {item.label}
+                            </NavLink>
+                        </li>
+                    ))}
+                </ul>
+                <button type="button" className="btn btn-outline-light btn-sm app-signout" onClick={signOut}>
+                    Sign Out
+                </button>
+            </nav>
+            <main className="app-content">
+                <Outlet />
+            </main>
         </div>
     )
 }
- 
+
 export default Dashboard

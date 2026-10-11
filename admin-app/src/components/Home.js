@@ -1,107 +1,79 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom'; 
-import api from '../api/api.js';
-import { fetchToken } from './Auth.js';
+import { Link } from 'react-router-dom';
+import api, { errorMessage } from '../api/api.js';
+import Alert from './ui/Alert.js';
+import Avatar from './ui/Avatar.js';
+import PageCard from './ui/PageCard.js';
+import Pagination from './ui/Pagination.js';
 
+const LIMIT = 10;
+
+/** Employee list with search; each row links to the edit page. */
 function Home() {
-    const [data, setData] = useState([]);
-    const [message, setMessage] = useState();
-
-    const [currentPage, setCurrentPage] = useState(1);
-    const [itemsPerPage] = useState(5);
-    const [itemsLength, setItemsLength] = useState(itemsPerPage);
-
-    let auth = fetchToken();
-    const headers = {
-        'Content-Type': 'application/json',
-        'Authorization': auth
-    };
-
-    const navigate = useNavigate(); 
-
-    const handleEdit = (id) => {
-        navigate(`/edit/${id}`);
-    };
+    const [result, setResult] = useState({ data: [], total: 0 });
+    const [page, setPage] = useState(1);
+    const [search, setSearch] = useState('');
+    const [query, setQuery] = useState('');
+    const [alert, setAlert] = useState(null);
 
     useEffect(() => {
-        if (message) {
-            alert(message);
-        }
-    }, [message]);
+        api.get('/employees', { params: { page, limit: LIMIT, search: query || undefined } })
+            .then(res => setResult(res.data))
+            .catch(err => setAlert({ type: 'danger', message: errorMessage(err) }));
+    }, [page, query]);
 
-    useEffect(() => {
-        api.get(`/readAll?page=${currentPage}&limit=${itemsPerPage}`, { headers })
-            .then(res => {
-                setData(res.data.data);
-                setItemsLength(res.data.total);
-            })
-            .catch(err => console.log(err));
-    }, [currentPage, itemsPerPage]);
-
-    // Change page
-    const paginate = (pageNumber) => setCurrentPage(pageNumber);
+    const submitSearch = (e) => {
+        e.preventDefault();
+        setPage(1);
+        setQuery(search.trim());
+    };
 
     return (
-        <div className='px-5 py-3'>
-            <div className='d-flex justify-content-center mt-2'>
-                <table className="table table-striped">
+        <PageCard title="Data Karyawan" wide>
+            <Alert alert={alert} onClose={() => setAlert(null)} />
+            <div className="d-flex flex-wrap gap-2 justify-content-between mb-3">
+                <form className="d-flex gap-2 flex-grow-1 search-form" onSubmit={submitSearch}>
+                    <input type="search" className="form-control" placeholder="Search name, email or position"
+                        value={search} onChange={e => setSearch(e.target.value)} />
+                    <button type="submit" className="btn btn-outline-primary">Cari</button>
+                </form>
+                <Link to="/create" className="btn btn-primary">+ Tambah Karyawan</Link>
+            </div>
+
+            <div className="table-responsive">
+                <table className="table table-striped align-middle">
                     <thead>
                         <tr>
-                            <th>Username</th>
-                            <th>Jabatan</th>
-                            <th>E-mail</th>
-                            <th>Office Number</th>
-                            <th>Phone Number</th>
-                            <th>Actions</th> 
+                            <th>Nama</th>
+                            <th>Posisi</th>
+                            <th>Email</th>
+                            <th>No. Handphone</th>
+                            <th></th>
                         </tr>
                     </thead>
                     <tbody>
-                        {data.map((user, index) => (
-                            <tr key={index}>
-                                <td>{user.username}</td>
-                                <td>{user.jabatan}</td>
+                        {result.data.length === 0 && (
+                            <tr><td colSpan={5} className="text-center text-muted">No employees found</td></tr>
+                        )}
+                        {result.data.map(user => (
+                            <tr key={user.id}>
+                                <td className="text-nowrap">
+                                    <Avatar src={user.avatar} name={user.name} size={36} />
+                                    <span className="ms-2">{user.name}</span>
+                                </td>
+                                <td>{user.position}</td>
                                 <td>{user.email}</td>
-                                <td>{user.office_number}</td>
-                                <td>{user.personal_number}</td>
-                                <td>
-                                    <button
-                                        onClick={() => handleEdit(user.id)} 
-                                        className="edit-button" 
-                                    >
-                                        Edit
-                                    </button>
+                                <td>{user.phone || '-'}</td>
+                                <td className="text-end">
+                                    <Link to={`/edit/${user.id}`} className="btn btn-sm btn-outline-secondary">Edit</Link>
                                 </td>
                             </tr>
                         ))}
                     </tbody>
                 </table>
             </div>
-            <div className="pagination">
-                <button
-                    onClick={() => paginate(currentPage - 1)}
-                    disabled={currentPage === 1}
-                    className="pagination-button"
-                >
-                    Previous
-                </button>
-                {Array.from({ length: Math.ceil(itemsLength / itemsPerPage) }).map((_, index) => (
-                    <button
-                        key={index}
-                        onClick={() => paginate(index + 1)}
-                        className={`pagination-button ${currentPage === index + 1 ? "active" : ""}`}
-                    >
-                        {index + 1}
-                    </button>
-                ))}
-                <button
-                    onClick={() => paginate(currentPage + 1)}
-                    disabled={currentPage === Math.ceil(itemsLength / itemsPerPage)}
-                    className="pagination-button"
-                >
-                    Next
-                </button>
-            </div>
-        </div>
+            <Pagination page={page} limit={LIMIT} total={result.total} onChange={setPage} />
+        </PageCard>
     );
 }
 

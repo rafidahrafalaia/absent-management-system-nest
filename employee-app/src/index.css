@@ -1,206 +1,193 @@
 body {
   margin: 0;
-  padding: 0;
-  height: 100vh;
-  width: 100vw;
+  background-color: #f4f6f9;
 }
 
+/* ---- Login ---- */
 .login-container {
-  width: 100%;
+  min-height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh;
-  width: 100vw;
+  padding: 16px;
 }
 
 .login-form-container {
-  background-color: rgba(255, 255, 255, 0.8);
-  border-radius: 10px;
-  padding: 30px;
+  background-color: #fff;
+  border-radius: 12px;
+  padding: 32px 24px;
   max-width: 400px;
   width: 100%;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.12);
 }
 
 .login-title {
   font-size: 24px;
-  margin-bottom: 20px;
+  margin-bottom: 4px;
   text-align: center;
-  color: #333;
 }
 
-.error-message {
-  color: red;
-  text-align: center;
-  margin-bottom: 20px;
-}
-
-.form-group {
-  margin-bottom: 15px;
-}
-
-.form-group label {
-  display: block;
-  margin-bottom: 5px;
-  font-weight: bold;
-  color: #555;
-}
-
-.form-control {
-  width: 100%;
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-}
-
-.form-options {
+/* ---- Layout: sidebar on desktop, top bar on mobile ---- */
+.app-layout {
   display: flex;
-  justify-content: space-between;
-  margin-bottom: 20px;
+  flex-direction: column;
+  min-height: 100vh;
 }
 
-.login-button {
-  width: 100%;
-  padding: 10px;
-  background-color: #007bff;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-}
-
-.login-button:hover {
-  background-color: #0056b3;
-}
-
-.signup-link {
-  text-align: center;
-  margin-top: 10px;
-}
-
-.link-signup {
-  color: #007bff;
-  text-decoration: none;
-}
-
-.link-signup:hover {
-  text-decoration: underline;
-}
-
-.button-container {
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
+.app-sidebar {
   display: flex;
-  gap: 10px;
-}
-
-.circular-button {
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
-  background-color: #3498db;
-  color: white;
-  border: none;
-  display: flex;
-  justify-content: center;
+  flex-wrap: wrap;
   align-items: center;
-  cursor: pointer;
-  transition: background-color 0.3s;
+  gap: 8px 16px;
+  padding: 12px 16px;
 }
 
-.circular-button:hover {
-  background-color: #2980b9;
+.app-brand {
+  font-weight: 700;
+  font-size: 1.1rem;
 }
 
-.form-container {
-  max-width: 70%;
-  margin: 0 auto;
-  padding: 20px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-}
-
-.form-container input {
-  display: block;
+.app-menu {
+  display: flex;
+  gap: 4px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  order: 3;
   width: 100%;
-  margin-bottom: 10px;
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+  overflow-x: auto;
 }
 
-.form-container button.submit-btn {
+.app-menu-link {
   display: block;
-  width: 100%;
-  padding: 10px;
-  background-color: #007bff;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-.form-container button.submit-btn:hover {
-  background-color: #0056b3;
-}
-
-.form-container button.edit-password-btn {
-  display: inline-block;
   padding: 6px 12px;
-  background-color: #d6bcb9;
-  color: white;
+  border-radius: 6px;
+  color: rgba(255, 255, 255, 0.75);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.app-menu-link:hover {
+  color: #fff;
+}
+
+.app-menu-link.active {
+  background-color: #0d6efd;
+  color: #fff;
+}
+
+.app-signout {
+  margin-left: auto;
+}
+
+.app-content {
+  flex: 1;
+  padding: 16px;
+}
+
+@media (min-width: 768px) {
+  .app-layout {
+    flex-direction: row;
+  }
+
+  .app-sidebar {
+    flex-direction: column;
+    flex-wrap: nowrap;
+    align-items: stretch;
+    width: 220px;
+    padding: 24px 16px;
+  }
+
+  .app-brand {
+    margin-bottom: 16px;
+  }
+
+  .app-menu {
+    flex-direction: column;
+    order: 0;
+  }
+
+  .app-signout {
+    margin: auto 0 0;
+  }
+
+  .app-content {
+    padding: 32px;
+  }
+}
+
+/* ---- Pages ---- */
+.page-card {
+  max-width: 720px;
+  margin: 0 auto;
   border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  margin-bottom: 10px;
 }
 
-.form-container button.edit-password-btn:hover {
-  background-color: #ff4c3a;
-}
-/* Parent container for avatar image and button */
-.avatar-container {
-  display: flex;
-  flex-direction: column; /* Vertically stack elements */
-  align-items: center; /* Center align elements */
-  margin-bottom: 10px; /* Optional spacing at the bottom */
+.page-title {
+  font-size: 1.4rem;
+  margin-bottom: 16px;
 }
 
-/* Avatar image styling */
-.avatar-preview {
-  width: 100px; /* Adjust size as needed */
-  height: 100px; /* Adjust size as needed */
-  border-radius: 50%; /* Optional: round the image */
-  margin-bottom: 10px; /* Space between image and button */
+.live-clock-time {
+  font-size: 3rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
 }
 
-/* Edit avatar button styling */
-.edit-avatar-btn {
-  padding: 6px 12px; /* Adjust padding as needed */
-  background-color: #d6bcb9;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
+.stat-box {
+  background-color: #f4f6f9;
+  border-radius: 8px;
+  padding: 12px;
 }
 
-.edit-avatar-btn:hover {
-  background-color: #ff4c3a;
+.stat-value {
+  font-size: 1.5rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
 }
 
-.avatar-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 100%;
-}
-
-.avatar-preview {
-  max-width: 100px;
-  max-height: 100px;
+/* ---- Avatar ---- */
+.avatar {
   border-radius: 50%;
   object-fit: cover;
-  margin-bottom: 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.avatar-initials {
+  background-color: #0d6efd;
+  color: #fff;
+  font-weight: 600;
+}
+
+.avatar-button {
+  position: relative;
+  border: none;
+  background: none;
+  padding: 0;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.avatar-edit-hint {
+  position: absolute;
+  inset: auto 0 0 0;
+  background-color: rgba(0, 0, 0, 0.55);
+  color: #fff;
+  font-size: 0.7rem;
+  padding: 2px 0;
+  border-radius: 0 0 999px 999px;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.avatar-button:hover .avatar-edit-hint,
+.avatar-button:focus .avatar-edit-hint {
+  opacity: 1;
+}
+
+.profile-details dt {
+  font-weight: 500;
+  color: #6c757d;
 }

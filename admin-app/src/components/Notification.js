@@ -1,36 +1,36 @@
-import React, {useState, useEffect} from 'react'
+import React, { useEffect } from 'react'
 import toast, { Toaster } from 'react-hot-toast';
-import { requestForToken, onMessageListener } from '../firebase';
+import { LOGGING_API_URL } from '../api/api.js';
+import { fetchToken } from './Auth.js';
+import { isFirebaseConfigured, registerPushNotifications } from '../firebase.js';
 
+/**
+ * Pops up a toast whenever an employee changes their profile.
+ * Events arrive over Server-Sent Events from the logging service (which consumes RabbitMQ).
+ * If Firebase is configured, this browser is also registered for FCM push while the tab is closed.
+ */
 const Notification = () => {
-  const [notification, setNotification] = useState({title: '', body: ''});
-  const notify = () =>  toast(<ToastDisplay/>);
-  function ToastDisplay() {
-    return (
-      <div>
-        <p><b>{notification?.title}</b></p>
-        <p>{notification?.body}</p>
-      </div>
-    );
-  };
-  
   useEffect(() => {
-    if (notification?.title ){
-     notify()
+    const token = encodeURIComponent(fetchToken());
+    const source = new EventSource(`${LOGGING_API_URL}/notifications/stream?token=${token}`);
+    source.onmessage = (event) => {
+      const { title, body } = JSON.parse(event.data);
+      toast(
+        <div>
+          <strong>{title}</strong>
+          <div>{body}</div>
+        </div>,
+        { duration: 8000, icon: '🔔' }
+      );
+    };
+
+    if (isFirebaseConfigured) {
+      registerPushNotifications().catch(err => console.warn('FCM registration failed', err));
     }
-  }, [notification])
+    return () => source.close();
+  }, []);
 
-  requestForToken();
-
-  onMessageListener()
-    .then((payload) => {
-      setNotification({title: payload?.notification?.title, body: payload?.notification?.body});     
-    })
-    .catch((err) => console.log('failed: ', err));
-
-  return (
-     <Toaster/>
-  )
+  return <Toaster position="top-right" />;
 }
 
 export default Notification
